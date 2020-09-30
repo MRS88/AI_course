@@ -1,0 +1,59 @@
+'''Задача 1
+Загрузите базу статистики по приложениям из Google Play. Определите уникальные категории приложений. В цикле найдите число приложений по каждой категории
+Описание базы:
+App - имя приложения
+Category - категория
+Rating - рейтинг
+Reviews - Число комментариев
+Size - Размер
+Instals - Число установок
+Type - Платное или бесплатное приложение
+Content Rating - Ограничения по возрасту
+Genres - Жанры
+Last Updated - Последнее обновление
+Current Ver - Текущая версия
+Android Ver - Вресия для Android
+Ссылка на базу: https://drive.google.com/file/d/1dwFUK1PxzVLSyzHjPImCw_XvTIP-llJQ/view?usp=sharing'''
+
+import pandas as pd
+
+data = pd.read_csv('/content/googleplaystore.csv')
+data_1 = data.Category.unique()
+# не понял, как циклом вывести - решил так:
+data.groupby(['Category'])['App'].count()
+
+
+'''Задача 2
+Отсортируйте приложения по рейтингу при помощи встроенных методов Pandas'''
+
+sorted_apps = data.sort_values('Rating', ascending=False)
+sorted_apps = sorted_apps.drop(index=[10472]) # удалил строку, где данные были смещены по столбцам влево
+sorted_apps
+
+
+'''Задача 3
+Оставьте в выборке только те приложения, которые имеют рейтинг в пределах от 5 до 3 (оба значения включительно)
+Узнайте число платных и бесплатных приложений в этом списке при помощи методов Pandas'''
+
+sorted_apps = sorted_apps[(sorted_apps['Rating'] >= 3) & (sorted_apps['Rating'] <= 5)]
+sorted_apps.groupby(['Type'])['Rating'].count()
+
+
+'''Задача 4
+В измененном массиве любым способом установите индексы из целых чисел в порядке возрастания'''
+
+df_size = sorted_apps.index.size
+index_list = list(sorted_apps.index)
+sorted_apps = sorted_apps.reset_index(drop=True)
+sorted_apps
+
+
+'''Задача 5
+Определите процент пустых ячеек к заполненным в начальной таблице. 
+Результат выведите в процентах с округлением до двух знаков.'''
+
+empty = data.isnull().sum().sum()
+fill = data.size - empty
+print('{:.2f}%'.format(empty/fill))
+print('{}%'.format((empty/fill).round(2)))
+print(f'{(empty/fill).round(2)}%')

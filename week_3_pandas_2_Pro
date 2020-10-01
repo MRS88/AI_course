@@ -1,0 +1,11 @@
+'''Задача 1: DateTime index
+Подгрузите данные 'data.csv' (возможно придется указать кодировку encoding сp1250) в переменную data.
+Преобразуйте колонку InvoiceDate в DateTime index.
+Удалите колонку InvoiceDate.'''
+
+import pandas as pd
+
+data = pd.read_csv('/content/data.csv', encoding='cp1250')
+data.index = pd.to_datetime(data.InvoiceDate)
+data.drop('InvoiceDate', axis=1, inplace=True)
+data.isna().sum()

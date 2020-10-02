@@ -9,3 +9,22 @@ data = pd.read_csv('/content/data.csv', encoding='cp1250')
 data.index = pd.to_datetime(data.InvoiceDate)
 data.drop('InvoiceDate', axis=1, inplace=True)
 data.isna().sum()
+
+
+'''Задача 2
+Используя датафрейм data, выберите все заказы, совершенные за период 7 декабря 2010 года с часа дня до часа и одной минуты.'''
+
+period = data[('2010-12-07 13:00:00' <= data.index) & (data.index <= '2010-12-07 13:01:00')]
+period
+
+
+'''Задача 3
+По той же рабочей табличке:
+посчитайте количество уникальных наименований товаров (Description), которые купили за весь период (т.е. по всем данным). 
+Используйте соответствующий метод.
+найдите все уникальные страны, в которых были размещены заказы'''
+
+print(period['Description'].nunique())
+print(data['Description'].nunique())
+data_1 = data.dropna(axis=0, how='any', subset=['Description'])['Country'].unique()
+data_1

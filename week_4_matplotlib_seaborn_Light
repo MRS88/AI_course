@@ -1,0 +1,17 @@
+'''Задача 1
+Используя библиотеку Matplotlib, постройте график экспоненты. 
+Подпишите оси. Дайте название графику.'''
+
+import matplotlib.pyplot as plt 
+import numpy as np 
+import seaborn as sns 
+import pandas as pd 
+
+x = np.arange(20)
+y = np.exp(x)
+plt.plot(y)
+plt.title('Экспонента')
+plt.xlabel('Ось X')
+plt.ylabel('Экспонента по X')
+plt.grid()
+plt.show()

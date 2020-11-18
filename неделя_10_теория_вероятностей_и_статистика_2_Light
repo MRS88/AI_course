@@ -1,1 +1,116 @@
+'''Задача 1
+Случайная величина ошибки взвешивания распределена по нормальному закону с нулевым математическим ожиданием и стандартным отклонением 4 грамма. 
+Найти вероятность того, что очередное взвешивание будет проведено с ошибкой, не превышающей по модулю 6 граммов.'''
 
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import norm, uniform
+
+mu, std = 0, 4
+nor = norm(mu, std)
+mean, var = nor.stats(moments='mv')
+print(nor.cdf(6) - nor.cdf(-6))
+print("Среднее: {}".format(mean))
+print("Дисперсия: {}".format(var))
+print('Перцентиль 25: {}'.format(nor.ppf(0.25)))
+print('Перцентиль 90: {}'.format(nor.ppf(0.9)))
+
+# рисуем cdf и pdf
+x = np.linspace(mu-3*std, mu+3*std, 1000)
+f = norm(mu, std).pdf(x)
+F = norm(mu, std).cdf(x)
+fig, ax = plt.subplots(1, 2, figsize=(12,5))
+ax[0].plot(x, f)
+ax[0].grid()
+ax[1].plot(x, F)
+ax[1].grid()
+
+
+'''Задача 2
+Автобусы некоторого маршрута идут строго по расписанию и интервалом 5 минут. 
+Составьте функцию плотности случайной величины X – времени ожидании очередного автобуса пассажиром, 
+который наугад подошёл к остановке. Найдите вероятность того, что он будет ждать автобус не более 2 минут.'''
+
+a = 0
+b = 5
+A = 1/(b-a) # плотность распределения
+p = uniform(a,b)
+mean, var = p.stats(moments='mv')
+print('Вероятность ожидания не более 2 минут =', p.cdf(2))
+print("Среднее: {}".format(mean))
+print("Дисперсия: {}".format(var))
+print('Перцентиль 25: {}'.format(p.ppf(0.25)))
+print('Перцентиль 90: {}'.format(p.ppf(0.9)))
+
+# рисуем cdf и pdf
+x = np.linspace(mean - 3*(p.std()), mean + 3*(p.std()), 1000)
+f = p.pdf(x)
+F = p.cdf(x)
+fig, ax = plt.subplots(1, 2, figsize=(12,5))
+ax[0].plot(x, f)
+ax[0].grid()
+ax[1].plot(x, F)
+ax[1].grid()
+
+
+'''Задача 3
+Рост мальчиков возрастной группы 15 лет - есть нормально распределённая случайная величина X с математическим ожиданием роста 161 см и 
+среднеквадратичным отклонением 4 см. Какую долю костюмов для мальчиков, имеющих рост от 152 до 158 см, 
+нужно предусмотреть в объёме производства для данной возрастной группы?'''
+
+mu = 161
+sigm = 4
+dist = norm(mu, sigm)
+mean, var = dist.stats(moments='mv')
+print('Вероятность = ', round(dist.cdf(158) - dist.cdf(152),3))
+print("Среднее: {}".format(mean))
+print("Дисперсия: {}".format(var))
+print('Перцентиль 25: {}'.format(dist.ppf(0.25)))
+print('Перцентиль 90: {}'.format(dist.ppf(0.9)))
+
+# рисуем cdf и pdf
+x = np.linspace(mu - 3*sigm, mu + 3*sigm, 1000)
+f = dist.pdf(x)
+F = dist.cdf(x)
+fig, ax = plt.subplots(1, 2, figsize=(12,5))
+ax[0].plot(x, f)
+ax[0].grid()
+ax[1].plot(x, F)
+ax[1].grid()
+
+
+'''Задача 4
+На машиностроительном заводе в процессе производства за неделю обнаруживается в среднем 100 бракованных деталей со среднеквадричным отклонением в 12 деталей. 
+Рассчитайте следующее: 
+1) вероятность того, что за неделю будет 20-30 бракованных деталей, 
+2) вероятность того, что за день будет хотя бы одна забракованная деталь.'''
+
+mu = 100
+sigm = 12
+
+def dist(details): 
+  return norm(mu, sigm).cdf(details)
+
+print(round(dist(30) - dist(20), 11))
+print(1 - norm(mu/7, sigm/7).cdf(1)) # без выходных
+
+mean, var = norm(mu, sigm).stats(moments='mv')
+print("Среднее: {}".format(mean))
+print("Дисперсия: {}".format(var))
+print('Перцентиль 25: {}'.format(norm(mu, sigm).ppf(0.25)))
+print('Перцентиль 90: {}'.format(norm(mu, sigm).ppf(0.9)))
+
+# рисуем cdf и pdf
+x = np.linspace(mu - 3*sigm, mu + 3*sigm, 1000)
+f = norm(mu, sigm).pdf(x)
+F = norm(mu, sigm).cdf(x)
+fig, ax = plt.subplots(1, 2, figsize=(12,5))
+ax[0].plot(x, f)
+ax[0].grid()
+ax[1].plot(x, F)
+ax[1].grid()
+
+
+'''Задача 5
+Для всех предыдущих задач вычислите среднее, дисперсию и 0.25 и 0.9 перцентили.
+Для всех предыдущих задач постройте графики cdf и pdf.'''

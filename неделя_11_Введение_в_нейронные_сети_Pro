@@ -1,0 +1,76 @@
+'''Распознайте рукописную цифру, созданную вами с помощью графического редактора (например, Paint).
+
+Последовательность шагов:
+1. В графическом редакторе рисуем произвольную цифру.
+2. Сохраняем документ и загружаем его в Colaboratory.
+3. С помощью функции image.load_img(path, target_size=(28, 28), color_mode = ‘grayscale’) загружаем картинку в переменную.
+4. С помощью функции image.img_to_array(img) преобразуем изображение в numpy-массив.
+5. Выполняем инверсию цветов, нормирование и решейп массива.
+6. Выполняем распознавание собственной рукописной цифры.'''
+
+
+from tensorflow.keras.datasets import mnist #Библиотека с базой Mnist
+from tensorflow.keras.models import Sequential # Подлючаем класс создания модели Sequential
+from tensorflow.keras.layers import Dense # Подключаем класс Dense - полносвязный слой
+from tensorflow.keras.optimizers import Adam # Подключаем оптимизатор Adam
+from tensorflow.keras import utils #Утилиты для to_categorical
+from tensorflow.keras.preprocessing import image #Для отрисовки изображения
+import numpy as np # Подключаем библиотеку numpy
+import matplotlib.pyplot as plt #Отрисовка изображений
+from PIL import Image, ImageOps #Отрисовка изображений
+#Отрисовывать изображения в ноутбуке, а не в консоль или файл
+%matplotlib inline
+
+img = image.load_img('/content/drive/My Drive/three.png', color_mode='grayscale') # target_size не нужен, т.к. уже 28х28
+img = ImageOps.invert(img) # инвертириуем, т.к. mnist тоже
+np_img_org = image.img_to_array(img)
+
+plt.imshow(Image.fromarray(np_img_org[:, :, 0]).convert('RGB'))
+plt.show()
+
+(x_train_org, y_train_org), (x_test_org, y_test_org) = mnist.load_data()
+
+#Меняем формат входных картинок с 28х28 на 784х1
+x_train = x_train_org.reshape(60000, 784)
+x_test = x_test_org.reshape(10000, 784)
+np_img_test = np_img_org.reshape(1, 784)
+print(x_train_org.shape)
+print(x_train.shape)
+print(np_img_test.shape)
+
+#Нормализуем входные картинки
+x_train = x_train.astype('float32') # преобразовываем x_train в тип float (цифры с плавающей точкой)
+x_train = x_train / 255 # делим на 255, чтобы диапазон был от 0 до 1
+x_test = x_test.astype('float32') # преобразовываем x_test в тип float (цифры с плавающей точкой)
+x_test = x_test / 255 # делим на 255, чтобы диапазон был от 0 до 1
+np_img_test = np_img_test / 255
+
+# Преобразуем ответы в формат one_hot_encoding
+y_train = utils.to_categorical(y_train_org, 10)
+y_test = utils.to_categorical(y_test_org, 10)
+
+model = Sequential() # Создаём сеть прямого распространения
+model.add(Dense(800, input_dim=784, activation="relu")) # Добавляем полносвязный слой на 800 нейронов с relu-активацией
+model.add(Dense(400, activation="relu")) # Добавляем полносвязный слой на 400 нейронов с relu-активацией
+model.add(Dense(10, activation="softmax")) # Добавляем полносвязный слой на 10 нейронов с softmax-активацией
+
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"]) # Компилируем модель
+print(model.summary()) #Вывод структуры модели
+
+model.fit(x_train, y_train, batch_size=128, epochs=15, verbose=1)
+
+#Выбираем нужную картинку из тестовой выборки
+x = np_img_test[0]
+print(x.shape)
+
+#Добавляем одну размерность в конце, чтобы нейронка могла распознать пример
+#Потому что нейронка принимает именно массив примеров для распознавания
+#Мы делаем массив из одного примера
+x = np.expand_dims(x, axis=0)
+print(x.shape)
+
+prediction = model.predict(x) #Распознаём наш пример
+print(prediction) #Выводим результат, это 10 цифр
+
+pred = np.argmax(prediction) # Получаем индекс самого большого элемента (это итоговая цифра, которую распознала сеть)
+print(pred)
